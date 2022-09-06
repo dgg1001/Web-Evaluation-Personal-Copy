@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<!-- Required meta tags -->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<!-- Bootstrap CSS -->
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+			
+		<!-- Eval form CSS -->
+		<link rel="stylesheet" type="text/css" href="/css/eval_form.css" />
+		
+		<script>
+		function uploadSpinner(id) {
+			document.getElementById(id).style.visibility = 'hidden';
+			document.getElementById(id).style.display = 'none';
+			document.getElementById(id + "Load").removeAttribute("hidden");
+		}
+		</script>
+		
+		<title>Evaluation Templates</title>
+	
+	</head>
+	
+	<body>
+
+		<!-- NAVBAR -->
+		<th:block th:switch="${completed}">
+			<th:block th:case="null">
+				<th:block th:switch="${hasEvals}">
+					<th:block th:case="yes">
+					
+						<!-- COMPLETE = "null", hasEvals = "yes" ======================================================================== -->
+						<nav class="navbar navbar-light bg-light justify-content-center">
+							<div class="btn-group" role="group">
+								<a th:href="@{/home}" class="btn btn-outline-success" type="button">Home</a>
+								<button th:onclick="|window.location.href='@{/admin_groups}'|" class="btn btn-outline-success" type="button">Groups</button>
+								<a th:href="@{/admin_evaluations}" class="btn btn-outline-success" type="button" style="color: #ffffff; background-color: #4CAF50">Evaluation Forms</a>
+								<a th:href="@{/Archivegroups}" class="btn btn-outline-success" type="button">Archive</a>
+								<a th:href="@{/user_settings/}" class="btn btn-outline-success" type="button">My Account</a>
+							</div>
+							<a th:href="@{/logout}" class="btn btn-outline-danger d-flex" type="button">Logout</a>
+						</nav>
+						
+					</th:block>
+					<th:block th:case="no">
+					
+						<!-- COMPLETE = "null", hasEvals = "no" ========================================================================== -->
+						<nav class="navbar navbar-light bg-light justify-content-center">
+							<div class="btn-group" role="group">
+								<a th:href="@{/home}" class="btn btn-outline-success" type="button">Home</a>
+								<span class="d-inline-block tooltip-wrapper" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content="Groups are inaccessable until at least one Evaluation Template is uploaded.">
+									<a href="#" class="btn btn-outline-success disabled" type="button">Groups</a>
+								</span>
+								<a th:href="@{/admin_evaluations}" class="btn btn-outline-success" type="button" style="color: #ffffff; background-color: #4CAF50">Evaluation Forms</a>
+								<a th:href="@{/Archivegroups}" class="btn btn-outline-success" type="button">Archive</a>
+								<a th:href="@{/user_settings/}" class="btn btn-outline-success" type="button">My Account</a>
+							</div>
+							<a th:href="@{/logout}" class="btn btn-outline-danger d-flex" type="button">Logout</a>
+						</nav>
+			
+					</th:block>
+				</th:block>
+			</th:block>
+			
+			<th:block th:case="*">
+				<th:block th:switch="${hasEvals}">
+					<th:block th:case="yes">
+					
+						<!-- COMPLETE = "*", hasEvals = "yes" ============================================================================== -->
+						<nav class="navbar navbar-light bg-light justify-content-center">
+							<div class="btn-group" role="group">
+								<button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#homeModal">Home</button>
+								<button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#groupsModal">Groups</button>
+								<button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#evalModal" style="color: #ffffff; background-color: #4CAF50">Evaluation Forms</button>
+								<button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#archModal">Archive</button>
+								<button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#accountModal">My Account</button>
+							</div>
+							<button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</button>
+						</nav>
+						
+					</th:block>
+					<th:block th:case="no">
+						<!-- COMPLETE = "*", hasEvals = "no" =============================================================================== -->
+						
+						<nav class="navbar navbar-light bg-light justify-content-center">
+							<div class="btn-group" role="group">
+								<button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#homeModal">Home</button>
+								<span class="d-inline-block tooltip-wrapper" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content="Groups are inaccessable until at least one Evaluation Template is uploaded.">
+									<a href="#" class="btn btn-outline-success disabled" type="button">Groups</a>
+								</span>
+								<button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#evalModal" style="color: #ffffff; background-color: #4CAF50">Evaluation Forms</button>
+								<button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#archModal">Archive</button>
+								<button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#accountModal">My Account</button>
+							</div>
+							<button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</button>
+						</nav>
+						
+					</th:block>
+				</th:block>
+			</th:block>
+		</th:block>
+	
+
+		<!-- EVAL ADMIN POPUPS -->
+			<!-- arch Btn Modal -->
+			<div class="modal fade" id="archModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="archModalLabel" aria-hidden="true">
+			  <div class="modal-dialog">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <h5 class="modal-title" id="archModalLabel">Warning</h5>
+			        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			      </div>
+			      <div class="modal-body">
+			        The evaluation file has not been saved. Are you sure you want to navigate away from this page? Changes will be lost.
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Stay on Page</button>
+			        <a th:href="@{/Archivegroups}" type="button" class="btn btn-primary">Continue and Discard</a>
+			      </div>
+			    </div>
+			  </div>
+			</div>
+			
+			<!-- Home Btn Modal -->
+			<div class="modal fade" id="homeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="homeModalLabel" aria-hidden="true">
+			  <div class="modal-dialog">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <h5 class="modal-title" id="homeModalLabel">Warning</h5>
+			        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			      </div>
+			      <div class="modal-body">
+			        The evaluation file has not been saved. Are you sure you want to navigate away from this page? Changes will be lost.
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Stay on Page</button>
+			        <a th:href="@{/home}" type="button" class="btn btn-primary">Continue and Discard</a>
+			      </div>
+			    </div>
+			  </div>
+			</div>
+			
+			<!-- Groups Btn Modal -->
+			<div class="modal fade" id="groupsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="groupsModalLabel" aria-hidden="true">
+			  <div class="modal-dialog">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <h5 class="modal-title" id="groupsModalLabel">Warning</h5>
+			        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			      </div>
+			      <div class="modal-body">
+			        The evaluation file has not been saved. Are you sure you want to navigate away from this page? Changes will be lost.
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Stay on Page</button>
+			        <a th:href="@{/admin_groups}" type="button" class="btn btn-primary">Continue and Discard</a>
+			      </div>
+			    </div>
+			  </div>
+			</div>
+			
+			<!-- Eval Btn Modal -->
+			<div class="modal fade" id="evalModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="evalModalLabel" aria-hidden="true">
+			  <div class="modal-dialog">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <h5 class="modal-title" id="evalModalLabel">Warning</h5>
+			        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			      </div>
+			      <div class="modal-body">
+			        The evaluation file has not been saved. Are you sure you want to navigate away from this page? Changes will be lost.
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Stay on Page</button>
+			        <a th:href="@{/admin_evaluations}" type="button" class="btn btn-primary">Continue and Discard</a>
+			      </div>
+			    </div>
+			  </div>
+			</div>
+			
+			<!-- Account Btn Modal -->
+			<div class="modal fade" id="accountModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="accountModalLabel" aria-hidden="true">
+			  <div class="modal-dialog">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <h5 class="modal-title" id="accountModalLabel">Warning</h5>
+			        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			      </div>
+			      <div class="modal-body">
+			        The evaluation file has not been saved. Are you sure you want to navigate away from this page? Changes will be lost.
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Stay on Page</button>
+			        <a th:href="@{/user_settings/}" type="button" class="btn btn-primary">Continue and Discard</a>
+			      </div>
+			    </div>
+			  </div>
+			</div>
+			
+			<!-- Logout Btn Modal -->
+			<div class="modal fade" id="logoutModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+			  <div class="modal-dialog">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <h5 class="modal-title" id="logoutModalLabel">Warning</h5>
+			        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			      </div>
+			      <div class="modal-body">
+			        The evaluation file has not been saved. Are you sure you want to navigate away from this page? Changes will be lost.
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Stay on Page</button>
+			        <a th:href="@{/logout}" type="button" class="btn btn-primary">Continue and Discard</a>
+			      </div>
+			    </div>
+			  </div>
+			</div>
+			
+			<div class="container  mt-5">
+	
+			<!-- UPLOADER -->
+			
+			<th:block th:switch="${completed}">
+				<th:block th:case="null">
+					
+					<div class="row">
+						<div class="col">
+							<nav class="navbar navbar-light bg-light ">
+								<button class="btn btn-outline-success justify-content-center"
+									type="button" data-bs-toggle="collapse" data-bs-target="#add"
+									aria-expanded="false" aria-controls="collapseExample">
+									Upload New Evaluation</button>
+							</nav>
+						</div>
+					</div>
+			
+					<div class="row">
+						<div class="col">
+							<div class="collapse show" id="add">
+								<div class="card card-body">
+									<form class="md-form" th:action="@{/upload_eval}" method="post"
+										enctype="multipart/form-data">
+										<span id="-upload"> <input type="file" name="file"
+											id="-file" /> <a href="#"
+											onclick="return !(document.getElementById('-upload').innerHTML=document.getElementById('-upload').innerHTML);">X</a>
+											<button id="importBtnLoad" class="btn btn-outline-success" type="button" disabled hidden="true">
+										  		<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+										 			 Loading...
+											</button>
+											<input id="importBtn" class="btn btn-outline-success" type="submit" value="Import" onclick="uploadSpinner('importBtn')"/>
+										</span>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				
+				</th:block>
+				<th:block th:case="*"></th:block>
+			</th:block>
+
+			<!-- CASE: IF ERRORS -->
+			<div th:switch="${error}">
+				<div class="row">
+					<div class="col">
+						<h2 th:case="null"></h2>
+						<div th:case="*">
+							<div class="alert alert-danger" role="alert"
+								th:utext="'<Strong>ERROR:&nbsp</strong>' + ${error}"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+	
+			<!-- CASE: IF ERRORS LIST -->
+			<div th:switch="${errorList}">
+				<div th:case="null"></div>
+				<div th:case="*">
+					<div th:unless="${errorList.empty}">
+						<div class="row">
+							<div class="col">
+								<div class="alert alert-danger" role="alert">
+									<div th:each="errorItem: ${errorList}">
+										<span th:utext="'<Strong>ERROR:&nbsp</strong>' + ${errorItem}"></span><br>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+	
+			<!-- CASE: IF WARNINGS LIST -->
+			<div th:switch="${warningList}">
+				<div th:case="null"></div>
+				<div th:case="*">
+					<div th:unless="${warningList.empty}">
+						<div class="row">
+							<div class="col">
+								<div class="alert alert-warning" role="alert">
+									<div th:each="warningItem: ${warningList}">
+										<span th:utext="'<Strong>WARNING:&nbsp</strong>' + ${warningItem}"></span><br>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<!-- CASE: IF any warnings or errors -->
+			<th:block th:switch="${showLog}">
+				<div th:case="null"></div>
+				<div th:case="*">
+					<div class="row">
+						<div class="col">
+							<a class="btn btn-outline-success " type="button" th:href="@{/dl_error_log/{evalId}(evalId = ${showLog})}">Download File with Error Log</a>
+						</div>
+					</div>
+				</div>
+			</th:block>
+		
+			<!-- CASE: IF SUBMITTED -->
+			<div th:switch="${completed}">
+				<h2 th:case="null"></h2>
+				<div th:case="*">
+	
+	
+					<div class="row">
+						<div class="col">
+							<div class="alert alert-success" role="alert"
+								th:utext="'<Strong>Upload Successful!&nbsp</strong>' + ${completed}"></div>
+						</div>
+					</div>
+	
+					<form action="#" th:action="@{/eval_form}" th:object="${eval}"
+						method="post">
+	
+						<div class="row">
+							<div class="col">
+								<nav class="navbar navbar-light bg-light ">
+									<div class="btn-group">
+										<button class="btn btn-outline-success justify-content-center"
+											type="button" data-bs-toggle="collapse"
+											data-bs-target="#preview" aria-expanded="false"
+											aria-controls="collapseExample">Toggle Preview</button>
+										<button id="saveBtnLoad" class="btn btn-outline-success" type="button" disabled hidden="true">
+										  		<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+										 			 Loading...
+										</button>
+										<input id="saveBtn" class="btn btn-outline-success justify-content-center" type="submit" onclick="uploadSpinner('saveBtn')" value="Save Evaluation Template">
+										<a class="btn btn-outline-danger " type="button" th:href="@{/admin_evaluations}">Cancel</a>
+									</div>
+								</nav>
+							</div>
+						</div>
+	
+	
+						<div class="row">
+							<div class="col">
+								<div class="collapse show" id="preview">
+										<div class="row overflow-scroll" style="height:700px;">
+											<div class="col-1"></div>
+											<div class="col-10 border border-secondary rounded-3 "> <!-- BEGIN EVAL DIV  -->
+											
+												<div class="row p-4">
+													<h1 class="display-6 text-center" th:text="${eval.title}"></h1>
+													<h5 class="text-muted text-center" th:text="${eval.description}"></h5>
+												</div>
+									
+												<th:block th:each="section: ${eval.Sections}">
+												
+													<div class="row border-top border-bottom border-secondary mt-5 p-2 bg-secondary bg-opacity-25">
+														<h3 th:text="${section.SecName}"></h3>
+														<h5 class="text-muted" th:utext="${section.SecDescription}"></h5>
+													</div>
+													
+													<div class="row m-2">
+														<th:block th:each="question: ${section.Questions}">
+														
+															<div th:class="${section.RowClass} + ' p-3'">
+																
+																<th:block th:if="${question.Required} == true">
+																	<strong th:utext="${question.QText} + '<span class=\'text-danger\'>*</span>'"></strong>
+																</th:block>
+																<th:block th:unless="${question.Required} == true">
+																	<strong th:utext="${question.QText}"></strong>
+																</th:block>
+																
+																<small class="text-muted" th:text="${question.QDescription}"></small>
+								
+																<!-- QUESTION TYPE SWITCH -->
+																<div th:switch="${question.QResponseType}"> 
+								
+																	<div th:case="'RADIO BUTTON'">
+																		<th:block th:each="option: ${question.Options}">
+																			<input type="radio" th:value="${option}" disabled>
+																			<label th:text="${option}"></label>
+																			<br>
+																		</th:block>
+																	</div>
+								
+																	<div th:case="'CHECK BOX'">
+																		<th:block th:each="option: ${question.Options}">
+																			<input type="checkbox" disabled>
+																			<label th:text="${option}"></label>
+																			<br>
+																		</th:block>
+																	</div>
+								
+																	<div th:case="'DROPDOWN'">
+																		<select name="response" th:id="${question.QuestID}">
+																			<option selected disabled hidden>Select an Option</option>
+																			<th:block th:each="option: ${question.Options}">
+																				<option th:text="${option}" disabled></option>
+																			</th:block>
+																		</select>
+																	</div>
+								
+																	<div th:case="'SINGLE LINE TEXT'">
+																		<input type="text" class="form-control" disabled>
+																	</div>
+								
+																	<div th:case="'PARAGRAPH TEXT'">
+																		<textarea rows="10" class="form-control" disabled></textarea>
+																	</div>
+								
+																	<div th:case="'COMPUTE'">
+																		<span class="text-muted fst-italic">Populated upon submitting an evaluation</span>
+																	</div>
+																	
+																	<div th:case="'PRE-LOAD'">
+																		<span class="text-muted fst-italic">Populated upon starting an evaluation</span>
+																	</div>
+																</div>
+															</div>
+														</th:block> <!-- END QUESTIONS BLOCK -->
+													</div>
+												</th:block> <!-- END SECTIONS BLOCK -->
+											</div> <!-- END EVAL DIV -->
+											
+											<div class="col-1"></div>
+										</div>
+									<input class="btn btn-outline-success justify-content-center" type="submit" value="Save Evaluation Template">
+								</div> <!-- END COLLAPSE -->
+							</div>
+						</div> <!-- END ROW -->
+					</form> <!-- END EVAL FORM -->
+				</div>
+			</div> <!-- END SWITCH -->
+			
+			<div class="row mt-5">
+				<div class="col">
+					<h3>Uploaded Evaluation Forms</h3>
+				</div>
+			</div>
+
+			<div th:switch="${hasEvals}">
+				
+				<div th:case="no" class="row mt-2">
+					<div class="col">
+						<div>No evaluation forms have been uploaded yet. Click 'Upload New Evaluation' above to upload a new evaluation Template file. </div>
+					</div>
+				</div>
+
+	
+				<div th:case="yes">
+					<div th:each="thisEval: ${evalList}">
+						<div class="accordion" th:id="${thisEval.EvalID} + '-accordion'">
+							<div class="accordion-item">
+								<div class="accordion-header" th:id="${thisEval.EvalID} + '-header'">
+									<div class="btn-group d-flex">
+										<button
+											th:utext="'<strong>Evaluation ' + ${thisEval.EvalID} + ': &nbsp&nbsp </strong>' + ${thisEval.Title}"
+											class="accordion-button" type="button"
+											th:data-bs-toggle="collapse"
+											th:data-bs-target="'#' + ${thisEval.EvalID} + '-collapse'"
+											aria-expanded="true"
+											th:aria-controls="${thisEval.EvalID} + '-collapse'"></button>
+										<a class="btn btn-outline-success " type="button" th:href="@{/download_eval_excel/{evalId}(evalId = ${thisEval.EvalID})}">Download Excel</a>
+										
+										<a class="btn btn-outline-success " type="button" th:href="@{/download_eval_results/{evalId}(evalId = ${thisEval.EvalID})}">Download Analysis</a>
+										
+										<th:block th:switch="${completed}">
+											<th:block th:case="null">
+												<th:block th:if="${thisEval.GroupsList.empty}">
+													<a class="btn btn-outline-danger" type="button" th:href="@{/del_eval_form/{evalId}(evalId = ${thisEval.EvalID})}">Delete Evaluation</a>
+												</th:block>
+												<th:block th:unless="${thisEval.GroupsList.empty}">
+													<span class="d-inline-block tooltip-wrapper" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content="Evaluation form is assigned to groups and cannot currently be deleted">
+														<button class="btn btn-outline-danger" type="button" disabled>Delete Evaluation</button>
+													</span>
+												</th:block>
+											</th:block>
+											<th:block th:case="*">
+												<span class="d-inline-block tooltip-wrapper" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content="Disabled during file upload">
+													<button class="btn btn-outline-danger" type="button" disabled>Delete Evaluation</button>
+												</span>
+											</th:block>
+										</th:block>
+
+									</div>
+								</div>
+								<div th:id="${thisEval.EvalID} + '-collapse'" class="accordion-collapse collapse" th:aria-labelledby="${thisEval.EvalID} + '-header'"
+									th:data-bs-parent="'#' + ${thisEval.EvalID} + '-accordion'">
+									<div class="accordion-body">
+									
+										<!-- GROUPS ASSIGNED -->
+										<div class="row" style="max-height:200px;overflow:scroll;">
+											<th:block th:if="${thisEval.GroupsList.empty}">
+												<ul class="list-group">
+													<li class="list-group-item list-group-item-dark">Assigned Groups: </li>
+													<li class="list-group-item text-muted">No groups assigned to this evaluation form. Go to the "Groups" page to upload groups.</li>
+												</ul>
+											</th:block>
+											<th:block th:unless="${thisEval.GroupsList.empty}">
+												<ul class="list-group">
+													<li class="list-group-item list-group-item-dark">Assigned Groups: </li>
+													<th:block th:each="group: ${thisEval.GroupsList}">
+														<li class="list-group-item" th:text="${group}"></li>
+													</th:block>
+												</ul>
+											</th:block>
+										</div>
+										
+										<!-- TEMPLATE PREVIEW -->
+										<div class="row">
+											<div class="col">
+												<button class="btn btn-outline-success justify-content-center"
+													type="button" data-bs-toggle="collapse"
+													th:data-bs-target="'#' + ${thisEval.EvalID} + '-list-preview'" aria-expanded="false"
+													aria-controls="collapseExample"> View Form </button>
+											</div>
+										</div>
+										
+										<div class="row">
+											<div class="col">
+												<div class="collapse" th:id="${thisEval.EvalID} + '-list-preview'">
+													<div class="row mt-2 overflow-scroll" style="height:500px;">
+														<div class="col-1"></div>
+														<div class="col-10 border border-secondary rounded-3 "> <!-- BEGIN EVAL DIV  -->
+														
+															<div class="row p-4">
+																<h1 class="display-6 text-center" th:text="${thisEval.title}"></h1>
+																<h5 class="text-muted text-center" th:text="${thisEval.description}"></h5>
+															</div>
+												
+															<th:block th:each="section: ${thisEval.Sections}">
+															
+																<div class="row border-top border-bottom border-secondary mt-5 p-2 bg-secondary bg-opacity-25">
+																	<h3 th:text="${section.SecName}"></h3>
+																	<h5 class="text-muted" th:utext="${section.SecDescription}"></h5>
+																</div>
+																
+																<div class="row m-2">
+																	<th:block th:each="question: ${section.Questions}">
+																	
+																		<div th:class="${section.RowClass} + ' p-3'">
+																			
+																			<strong th:utext="${question.QText}"></strong>
+																			<small class="text-muted" th:text="${question.QDescription}"></small>
+											
+																			<!-- QUESTION TYPE SWITCH -->
+																			<div th:switch="${question.QResponseType}"> 
+											
+																				<div th:case="'RADIO BUTTON'">
+																					<th:block th:each="option: ${question.Options}">
+																						<input type="radio" th:value="${option}" disabled>
+																						<label th:text="${option}"></label>
+																						<br>
+																					</th:block>
+																				</div>
+											
+																				<div th:case="'CHECK BOX'">
+																					<th:block th:each="option: ${question.Options}">
+																						<input type="checkbox" disabled>
+																						<label th:text="${option}"></label>
+																						<br>
+																					</th:block>
+																				</div>
+											
+																				<div th:case="'DROPDOWN'">
+																					<select name="response" th:id="${question.QuestID}">
+																						<option selected disabled hidden>Select an Option</option>
+																						<th:block th:each="option: ${question.Options}">
+																							<option th:text="${option}" disabled></option>
+																						</th:block>
+																					</select>
+																				</div>
+											
+																				<div th:case="'SINGLE LINE TEXT'">
+																					<input type="text" class="form-control" disabled>
+																				</div>
+											
+																				<div th:case="'PARAGRAPH TEXT'">
+																					<textarea rows="10" class="form-control" disabled></textarea>
+																				</div>
+											
+																				<div th:case="'COMPUTE'">
+																					<span class="text-muted fst-italic">Populated upon submitting an evaluation</span>
+																				</div>
+																				
+																				<div th:case="'PRE-LOAD'">
+																					<span class="text-muted fst-italic">Populated upon starting an evaluation</span>
+																				</div>
+																			</div>
+																		</div>
+																	</th:block> <!-- END QUESTIONS BLOCK -->
+																</div>
+															</th:block> <!-- END SECTIONS BLOCK -->
+														</div> <!-- END EVAL DIV -->
+														
+														<div class="col-1"></div>
+													</div>
+												</div> <!-- END COLLAPSE -->
+											</div>
+										</div> <!-- END TEMPLATE PREVIEW (TEMPLATE LIST) -->
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- END CONTAINER -->
+		
+		
+	
+	    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+		<script>
+		var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+		var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+		  return new bootstrap.Popover(popoverTriggerEl)
+		})
+		</script>
+	</body>
+</html>

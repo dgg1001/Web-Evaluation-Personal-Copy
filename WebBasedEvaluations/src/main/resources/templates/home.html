@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Bootstrap CSS -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+	crossorigin="anonymous">
+	
+<!-- Eval form CSS -->
+<link rel="stylesheet" type="text/css" href="/css/eval_form.css" />
+
+<title>Home</title>
+</head>
+<body>
+
+	<div th:switch="${role}">
+
+		<!-- ADMIN NAVBAR -->
+		<nav th:case="ADMIN"
+			class="navbar navbar-light bg-light justify-content-center">
+			<div class="btn-group" role="group">
+				<a th:href="@{/home}" class="btn btn-outline-success" style="color:#ffffff; background-color:#4CAF50" type="button"> Home </a>
+				<a th:href="@{/admin_users/?keyword={keyword}&perPage={perPage}&sort={sort}&currPage={currPage}&sortOr={sortOr}(perPage= 0,keyword='',sort='id',currPage=1,sortOr=1)}"
+					class="btn btn-outline-success" type="button">Manage Users</a>
+				<a th:href="@{/user_settings/?keyword={keyword}&perPage={perPage}&sort={sort}(perPage= 0,keyword='',sort='')}"
+					class="btn btn-outline-success" type="button">My Account</a>
+				<a th:href="@{/download_log_txt}" class="btn btn-outline-success d-flex" type="button">Download Log File</a>
+			</div>
+			<a th:href="@{/logout}" class="btn btn-outline-danger d-flex" type="button"> Logout </a>
+		</nav>
+
+
+		<!-- EVAL_ADMIN NAVBAR -->
+		<nav th:case="EVAL_ADMIN"
+			class="navbar navbar-light bg-light justify-content-center">
+			<div class="btn-group" role="group">
+				<a th:href="@{/home}" class="btn btn-outline-success" style="color:#ffffff; background-color:#4CAF50" type="button">Home</a>
+				
+				<th:block th:if="${groupButton == true}">
+					<a th:href="@{/admin_groups}" class="btn btn-outline-success" type="button">Groups</a>
+				</th:block>
+				<th:block th:unless="${groupButton == true}">
+					<span class="d-inline-block tooltip-wrapper" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content="Groups are inaccessable until at least one Evaluation Template is uploaded.">
+						<a href="#" class="btn btn-outline-success disabled" type="button">Groups</a>
+					</span>
+				</th:block>
+				
+				<a th:href="@{/admin_evaluations}" class="btn btn-outline-success" type="button">Evaluation Forms</a>
+				<a th:href="@{/Archivegroups}" class="btn btn-outline-success" type="button">Archive</a>
+				<a th:href="@{/user_settings/}" class="btn btn-outline-success" type="button">My Account</a>
+			</div>
+			<a th:href="@{/logout}" class="btn btn-outline-danger d-flex"
+				type="button"> Logout </a>
+		</nav>
+
+
+		<!-- EVALUATOR NAVBAR -->
+		<nav th:case="EVALUATOR" class="navbar navbar-light bg-light justify-content-center">
+			<div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+				<a th:href="@{/home}" class="btn" style="color:#ffffff; background-color:#4CAF50" type="button">Home</a>
+				<a th:href="@{/Evaluationgroups}" class="btn btn-outline-success" type="button">Evaluation Groups</a>
+				<a th:href="@{/user_settings/}" class="btn btn-outline-success" type="button" >My Account</a>
+			</div>
+			<a th:href="@{/logout}" class="btn btn-outline-danger d-flex"
+				type="button"> Logout </a>
+		</nav>
+
+		<!-- EVALUATOR_EVAL NAVBAR -->
+		<nav th:case="EVALUATOR_EVAL"
+			class="navbar navbar-light bg-light justify-content-center">
+			<div class="btn-group" role="group"
+				aria-label="Button group with nested dropdown">
+				<a th:href="@{/home}" class="btn btn-outline-success" style="color:#ffffff; background-color:#4CAF50" type="button">Home</a>
+				<div class="btn-group" role="group">
+					<button id="btnGroupDrop1" type="button"
+						class="btn btn-outline-success dropdown-toggle"
+						data-bs-toggle="dropdown" aria-expanded="false">Evaluate</button>
+					<ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+						<li><a class="dropdown-item" th:href="@{/Evaluationgroups}">View Groups</a></li>
+						<li><a class="dropdown-item" th:href="@{/myeval}">My Evaluations</a></li>
+					</ul>
+				</div>
+				<a th:href="@{/user_settings/}" class="btn btn-outline-success" type="button">My Account</a>
+			</div>
+			<a th:href="@{/logout}" class="btn btn-outline-danger d-flex" type="button"> Logout </a>
+		</nav>
+		
+		<!-- USER NAVBAR -->
+		<nav th:case="USER"
+			class="navbar navbar-light bg-light  justify-content-center">
+			<div class="btn-group" role="group">
+				<a th:href="@{/home}" class="btn btn-outline-success" style="color:#ffffff; background-color:#4CAF50" type="button">Home</a>
+				<a th:href="@{/myeval}" class="btn btn-outline-success"
+					type="button">My Evaluations</a> <a th:href="@{/user_settings/}"
+					class="btn btn-outline-success" type="button">My Account</a>
+			</div>
+			<a th:href="@{/logout}" class="btn btn-outline-danger d-flex" type="button"> Logout </a>
+
+		</nav>
+	</div>
+
+
+
+	<div class="container  mt-5">
+		<div th:switch="${error}">
+			<h2 th:case="null"></h2>
+			<div th:case="*">
+
+
+				<div class="row">
+					<div class="col">
+						<div class="alert alert-danger" role="alert"
+							th:utext="'<Strong>Error&nbsp</strong>' + ${error} "></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="text-center" th:text="${role}"></div>
+		<h3 id="test1"></h3>
+		
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+		<script>
+		var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+		var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+		  return new bootstrap.Popover(popoverTriggerEl)
+		})
+		</script>
+	</div>
+</body>
+</html>

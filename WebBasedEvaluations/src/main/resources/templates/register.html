@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Creating a New User</title>
+</head>
+<body>
+	<h1 th:text="${ansr}"></h1>
+
+<form action="#" th:action="@{/registerUser}" th:object="${user}" method="post">
+
+
+
+
+    <label for="name">Name</label>
+    <input type="text" th:field="*{name}" id="name" placeholder="Name">
+    <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+    
+    <label for="email">Email</label>
+    <input type="text" th:field="*{email}" id="email" placeholder="Email">
+    <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+    
+    <label for="password">Password</label>
+    <input type="text" th:field="*{password}" id="password" placeholder="Password">
+    <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+
+    <select th:field="*{roles}"id="roles" name="roles">
+        <option value="ADMIN"> ADMIN </option>
+        <option value="EVALUATOR"> EVALUATOR </option>
+        <option value="USER"> USER </option>
+    </select>
+    
+    <input type="submit" value="Add User">  
+     <li> <a href="/home" th:href="@{/home}"> Return Home</a></li>
+     
+</form>
+</body>
+</html>

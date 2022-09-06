@@ -1,0 +1,30 @@
+
+.dashed-underline {
+	border-bottom: 1px dashed black;
+}
+
+.solid-underline {
+	border-bottom: 1px solid black;
+}
+
+.alert {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.tooltip-wrapper {
+    display: inline-block;
+    float: left;
+}
+
+.tooltip-wrapper .btn {
+    border-radius: 0;
+}
+
+.tooltip-wrapper:first-child .btn {
+    border-radius: 3px 0 0 3px;
+}
+
+.tooltip-wrapper:last-child .btn {
+    border-radius: 0 3px 3px 0;
+}

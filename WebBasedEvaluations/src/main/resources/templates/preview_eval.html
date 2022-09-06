@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Eval form CSS -->
+<link rel="stylesheet" type="text/css" href="/css/eval_form.css" />
+
+<!-- Bootstrap CSS -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+	crossorigin="anonymous">
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+	integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+	crossorigin="anonymous">
+	
+</script>
+
+<title>Evaluation Form</title>
+</head>
+
+<body>
+	<nav class="navbar navbar-light bg-light  justify-content-center ">
+		<div class="btn-group">
+			<a th:href="${address}" class="btn btn-outline-danger" type="button">
+				Back </a>
+				
+		<div th:if="${attach}">
+			<a th:href="@{/downloada/{log}(log= ${log})}" class="btn btn-success" type="button">
+				download</a>
+		</div>
+		</div>
+		
+	</nav>
+
+	<div class="container  mt-5">
+
+
+		<div class="container">
+			<!-- BEGIN EVALUATION FORM -->
+			<div class="row">
+				<div class="col-1"></div>
+				<div class="col-10 border border-secondary rounded-3 ">
+					<!-- BEGIN EVAL DIV  -->
+
+					<div class="row p-4">
+						<h1 class="display-6 text-center" th:text="${eval.title}"></h1>
+						<h5 class="text-muted text-center" th:text="${eval.description}"></h5>
+					</div>
+
+					<th:block th:each="section: ${eval.Sections}">
+
+						<div
+							class="row border-top border-bottom border-secondary mt-5 p-2 bg-secondary bg-opacity-25">
+							<h3 th:text="${section.SecName}"></h3>
+							<h5 class="text-muted" th:utext="${section.SecDescription}"></h5>
+						</div>
+
+						<div class="row m-2">
+							<th:block th:each="question: ${section.Questions}">
+
+								<div th:class="${section.RowClass} + ' p-3'">
+
+									<strong th:utext="${question.QText}"></strong> <small
+										class="text-muted" th:text="${question.QDescription}"></small>
+
+									<!-- QUESTION TYPE SWITCH -->
+									<div th:switch="${question.QResponseType}">
+
+										<div th:case="'RADIO BUTTON'">
+											<th:block th:if="${question.QResponse} != ''">
+												<span th:utext="'<br>' + ${question.QResponse}"></span>
+											</th:block>
+											<th:block th:unless="${question.QResponse} != ''">
+												<br>
+												<em class="text-muted">NO RESPONSE</em>
+											</th:block>
+										</div>
+
+										<div th:case="'CHECK BOX'">
+											<th:block th:if="${question.Responses.empty}">
+												<br>
+												<em class="text-muted">NO RESPONSE</em>
+											</th:block>
+											<th:block th:unless="${question.Responses.empty}">
+												<th:block th:each="response: ${question.Responses}">
+													<span th:utext="'<br>' + ${response}"></span>
+												</th:block>
+											</th:block>
+
+										</div>
+
+										<div th:case="'DROPDOWN'">
+											<th:block th:if="${question.QResponse} != ''">
+												<span th:utext="'<br>' + ${question.QResponse}"></span>
+											</th:block>
+											<th:block th:unless="${question.QResponse} != ''">
+												<br>
+												<em class="text-muted">NO RESPONSE</em>
+											</th:block>
+										</div>
+
+										<div th:case="'SINGLE LINE TEXT'">
+											<th:block th:if="${question.QResponse} != ''">
+												<span th:utext="'<br>' + ${question.QResponse}"></span>
+											</th:block>
+											<th:block th:unless="${question.QResponse} != ''">
+												<br>
+												<em class="text-muted">NO RESPONSE</em>
+											</th:block>
+										</div>
+
+										<div th:case="'PARAGRAPH TEXT'">
+											<th:block th:if="${question.QResponse} != ''">
+												<span th:utext="'<br>' + ${question.QResponse}"></span>
+											</th:block>
+											<th:block th:unless="${question.QResponse} != ''">
+												<br>
+												<em class="text-muted">NO RESPONSE</em>
+											</th:block>
+										</div>
+
+										<div th:case="'COMPUTE'">
+											<span th:utext="${question.QResponse}"></span>
+										</div>
+
+										<div th:case="'PRE-LOAD'">
+											<span class="text-muted" th:utext="${question.QResponse}"></span>
+										</div>
+									</div>
+								</div>
+							</th:block>
+							<!-- END QUESTIONS BLOCK -->
+						</div>
+					</th:block>
+					<!-- END SECTIONS BLOCK -->
+				</div>
+				<!-- END EVAL DIV -->
+				<div class="col-1"></div>
+			</div>
+		</div>
+		<!-- End Evaluation container -->
+	</div>
+	<!-- END CONTAINER -->
+</body>
+</html>

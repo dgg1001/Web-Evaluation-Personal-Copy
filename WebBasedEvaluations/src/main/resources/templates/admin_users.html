@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Bootstrap CSS -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+	crossorigin="anonymous">
+
+
+
+<title>Users</title>
+</head>
+<body>
+
+	<!-- ADMIN NAVBAR -->
+	<nav class="navbar navbar-light bg-light justify-content-center">
+		<div class="btn-group" role="group">
+			<a th:href="@{/home}" class="btn btn-outline-success " type="button">
+				Home </a><a style="color: #ffffff; background-color: #4CAF50"
+				th:href="@{/admin_users/?keyword={keyword}&perPage={perPage}&sort={sort}&currPage={currPage}&sortOr={sortOr}(perPage=${perPage},keyword=${keyword},sort=${sort},currPage=${currPage}, sortOr=${sortOr})}"
+				class="btn btn-outline-success" type="button">Manage Users</a> <a
+				th:href="@{/user_settings/?keyword={keyword}&perPage={perPage}&sort={sort}&currPage={currPage}&sortOr={sortOr}(perPage=${perPage},keyword=${keyword},sort=${sort},currPage=${currPage}, sortOr=${sortOr})}"
+				class="btn btn-outline-success" type="button">My Account</a> <a
+				th:href="@{/download_log_txt}"
+				class="btn btn-outline-success d-flex" type="button">Download
+				Log File</a>
+		</div>
+		<a th:href="@{/logout}" class="btn btn-outline-danger d-flex"
+			type="button"> Logout </a>
+	</nav>
+
+	<!-- Home Btn Modal -->
+
+
+
+	<div class="container  mt-5">
+
+
+		<nav class="navbar navbar-light bg-light ">
+
+			<button id="addUser"
+				class="btn btn-outline-success justify-content-center" type="button"
+				data-bs-toggle="collapse" data-bs-target="#add"
+				aria-expanded="false" aria-controls="collapseExample">Add
+				User</button>
+
+
+
+		</nav>
+
+		<div class="row">
+			<div class="col">
+				<div class="collapse" id="add">
+					<div class="card card-body">
+						<form class="md-form"
+							th:action="@{/uploaduser2/?keyword={keyword}&perPage={perPage}&sort={sort}&currPage={currPage}&sortOr={sortOr}(perPage=${perPage},keyword=${keyword},sort=${sort},currPage=${currPage},sortOr=${sortOr})}"
+							method="post" enctype="multipart/form-data">
+							<span id="-upload">
+
+								<div>
+									<input type="file" name="file" class="form-control" id="-file" />
+								</div> &nbsp
+								<div>
+									<input id="importBtn" class="btn btn-outline-success"
+										type="submit" value="Import"
+										onclick="uploadSpinner('importBtn')" />
+									<button id="importBtnLoad" class="btn btn-outline-success"
+										type="button" disabled hidden="true">
+										<span class="spinner-border spinner-border-sm" role="status"
+											aria-hidden="true"></span> Loading...
+									</button>
+									&nbsp
+									<button href="#"
+										onclick="return !(document.getElementById('-upload').innerHTML=document.getElementById('-upload').innerHTML);"
+										class="btn btn-outline-warning">Remove</button>
+								</div>
+							</span>
+
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col">
+				<div class="collapse" id="add">
+					<div class="card card-body">
+						<form action="#"
+							th:action="@{/adduser/?keyword={keyword}&perPage={perPage}&sort={sort}&currPage={currPage}&sortOr={sortOr}(perPage=${perPage},keyword=${keyword},sort=${sort},currPage=${currPage},sortOr=${sortOr})}"
+							th:object="${user}" method="post">
+
+							<div class="container">
+								<div class="row align-items-start">
+									<div class="col" align="right">
+										<div>
+											<label for="firstName">First Name</label> <input type="text"
+												th:field="*{firstName}" id="addFirstName"
+												placeholder="First Name"> <span
+												th:if="${#fields.hasErrors('firstName')}"
+												th:errors="*{firstName}"></span>
+										</div>
+										&nbsp
+										<div>
+											<label for="lastName">Last Name</label> <input type="text"
+												th:field="*{lastName}" id="addLastName"
+												placeholder="Last Name"> <span
+												th:if="${#fields.hasErrors('lastName')}"
+												th:errors="*{lastName}"></span>
+										</div>
+										&nbsp
+										<div>
+											<label for="suffixName">Suffix</label> <input type="text"
+												th:field="*{suffixName}" id="addSuffixName"
+												placeholder="Suffix Name"> <span
+												th:if="${#fields.hasErrors('suffixName')}"
+												th:errors="*{suffixName}"></span>
+										</div>
+										&nbsp
+										<div>
+											<label for="email">Email</label> <input type="text"
+												th:field="*{email}" id="addEmail" placeholder="Email">
+											<span th:if="${#fields.hasErrors('email')}"
+												th:errors="*{email}"></span>
+										</div>
+									</div>
+									<div class="col" align="right">
+										<div>
+											<label for="jobTitle">Job</label> <input type="text"
+												th:field="*{jobTitle}" id="jobTitle" placeholder="Job Title">
+										</div>
+										&nbsp
+										<div>
+											<label for="supervisor">Supervisor</label> <input type="text"
+												th:field="*{supervisor}" id="supervisor"
+												placeholder="Supervisor">
+										</div>
+										&nbsp
+										<div>
+											<label for="companyName">Company Name</label> <input
+												type="text" th:field="*{companyName}" id="companyName"
+												placeholder="Company Name">
+										</div>
+										&nbsp
+										<div>
+											<label for="divisionBranch">Division Branch</label> <input
+												type="text" th:field="*{divisionBranch}" id="divisionBranch"
+												placeholder="Division Branch">
+										</div>
+										&nbsp
+										<div>
+											<label for="dateOfHire">Date Of Hire</label> <input
+												type="date" th:field="*{dateOfHire}" id="dateOfHire"
+												placeholder="Date Of Hire(XX-XX-XXXX)">
+										</div>
+									</div>
+									<div class="col" align="right">
+										<div>
+											<label for="password">Password</label> <input
+												data-toggle="tooltip" title="Length must be at least five characters" type="password"
+												th:field="*{password}" id="password"
+												placeholder="Password"> <span
+												th:if="${#fields.hasErrors('password')}"
+												th:errors="*{password}"></span>
+										</div>
+										&nbsp
+										<div>
+											<div>
+												<label for="roles">Role</label> <select th:field="*{roles}"
+													id="roles" name="roles">
+
+													<option value="USER" selected>USER</option>
+													<option value="EVALUATOR">EVALUATOR</option>
+													<option value="EVAL_ADMIN">EVAL_ADMIN</option>
+													<option value="EVALUATOR_EVAL">EVALUATOR_EVAL</option>
+													<option value="ADMIN">ADMIN</option>
+
+
+
+												</select>
+											</div>
+											&nbsp
+											<div>
+												<input type="submit" class="btn btn-outline-success "
+													value="Save User">
+											</div>
+										</div>
+									</div>
+
+								</div>
+
+							</div>
+						</form>
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row" th:switch="${ansr}">
+			<div class="col">
+				<div th:case="addFail">
+					<div class="col">
+						<div class="alert alert-danger alert-dismissible fade show"
+							role="alert">
+							<span th:utext="'<Strong>ERROR:&nbsp</strong>'+ ${mess}"></span>
+							<button type="button" class="btn-close" data-bs-dismiss="alert"
+								aria-label="Close"></button>
+						</div>
+					</div>
+				</div>
+
+
+
+				<div th:case="addPass">
+
+					<div class="col">
+						<div class="alert alert-success alert-dismissible fade show"
+							role="alert">
+							<span th:utext="'<Strong>SUCCESS:&nbsp</strong>'+ ${mess}"></span>
+							<button type="button" class="btn-close" data-bs-dismiss="alert"
+								aria-label="Close"></button>
+						</div>
+					</div>
+
+				</div>
+
+
+				<div th:case="*"></div>
+
+			</div>
+		</div>
+		<div class="row" th:switch="${log}">
+			<div class="col">
+				<div th:case="error">
+					<div class="col">
+						<div class="alert alert-warning alert-dismissible fade show"
+							role="alert">
+							<span
+								th:utext="'<Strong>WARNING:&nbsp</strong>'+ 'Some user(s) was/were not added, check log file'"></span>
+							<button type="button" class="btn-close" data-bs-dismiss="alert"
+								aria-label="Close"></button>
+						</div>
+					</div>
+
+
+
+				</div>
+
+				<div th:case="*"></div>
+
+			</div>
+		</div>
+		<div class="row">
+			<div class="col">
+
+
+
+				<form th:action="@{/admin_users/}" method="get">
+					&nbsp
+					<div align="center">
+
+						<input type="text" name="keyword" th:value="${keyword}"
+							placeholder="Find by Name/Email			Press Enter or Search to display results"
+							size="100"> <input type="hidden" name="currPage"
+							th:value=1 />
+					</div>
+					<div class="d-flex justify-content-center flex-nowrap">
+						<div class="col" display="inline-block">
+							<div th:switch="${perPage}">
+								<div th:case="10">
+									<select placeholder="Amount to Display" id="perPage"
+										name="perPage">
+										<option value="0">All</option>
+										<option value="10" selected>10</option>
+										<option value="20">20</option> F
+										<option value="30">30</option>
+									</select>
+								</div>
+								<div th:case="20">
+									<select placeholder="Amount to Display" id="perPage"
+										name="perPage">
+										<option value="0">All</option>
+
+										<option value="10">10</option>
+										<option value="20" selected>20</option>
+
+										<option value="30">30</option>
+									</select>
+								</div>
+								<div th:case="30">
+									<select placeholder="Amount to Display" id="perPage"
+										name="perPage">
+										<option value="0">All</option>
+
+										<option value="10">10</option>
+										<option value="20">20</option>
+
+										<option value="30" selected>30</option>
+									</select>
+								</div>
+								<div th:case="0">
+									<select placeholder="Amount to Display" id="perPage"
+										name="perPage">
+										<option value="0" selected>All</option>
+
+										<option value="10">10</option>
+										<option value="20">20</option>
+
+										<option value="30">30</option>
+									</select>
+								</div>
+								<div th:case="*">
+									<select placeholder="Amount to Display" id="perPage"
+										name="perPage">
+										<option value="0" selected>All</option>
+
+										<option value="10">10</option>
+										<option value="20">20</option>
+
+										<option value="30">30</option>
+									</select>
+								</div>
+							</div>
+
+
+							&nbsp
+
+							<div th:switch="${sort}">
+								<div th:case="firstName">
+									<select placeholder="Sort by:" id="sort" name="sort">
+										<option value="id">Id</option>
+
+										<option value="firstName" selected>First Name</option>
+										<option value="lastName">Last Name</option>
+
+										<option value="email">Email</option>
+										<option value="role">Role</option>
+
+									</select>
+								</div>
+
+								<div th:case="lastName">
+									</select> <select placeholder="Sort by:" id="sort" name="sort">
+										<option value="id">Id</option>
+
+										<option value="firstName">First Name</option>
+										<option value="lastName" selected>Last Name</option>
+
+										<option value="email">Email</option>
+										<option value="role">Role</option>
+
+									</select>
+								</div>
+								<div th:case="email">
+									</select> <select placeholder="Sort by:" id="sort" name="sort">
+										<option value="id">Id</option>
+
+										<option value="firstName">First Name</option>
+										<option value="lastName">Last Name</option>
+
+										<option value="email" selected>Email</option>
+										<option value="role">Role</option>
+
+									</select>
+								</div>
+								<div th:case="id">
+									<select placeholder="Sort by:" id="sort" name="sort">
+										<option value="id" selected>Id</option>
+
+										<option value="firstName">First Name</option>
+										<option value="lastName">Last Name</option>
+
+										<option value="email">Email</option>
+										<option value="role">Role</option>
+
+									</select>
+								</div>
+								<div th:case="role">
+									<select placeholder="Sort by:" id="sort" name="sort">
+										<option value="id">Id</option>
+
+										<option value="firstName">First Name</option>
+										<option value="lastName">Last Name</option>
+
+										<option value="email">Email</option>
+										<option value="role" selected>Role</option>
+
+									</select>
+								</div>
+
+								<div th:case="*">
+									</select> <select placeholder="Sort by:" id="sort" name="sort">
+										<option value="id" selected>Id</option>
+
+										<option value="firstName">First Name</option>
+										<option value="lastName">Last Name</option>
+
+										<option value="email">Email</option>
+									</select>
+								</div>
+							</div>
+
+							&nbsp
+							<div th:switch="${sortOr}">
+								<div th:case="1">
+									<select placeholder="Sorting Orientation" id="sortOr"
+										name="sortOr">
+										<option value="1" Selected>Ascending</option>
+										<option value="2">Descending</option>
+									</select>
+								</div>
+								<div th:case="2">
+									<select placeholder="Sorting Orientation" id="sortOr"
+										name="sortOr">
+										<option value="1">Ascending</option>
+										<option value="2" selected>Descending</option>
+									</select>
+								</div>
+								<div th:case="*">
+									<select placeholder="Sorting Orientation" id="sortOr"
+										name="sortOr">
+										<option value="1">Ascending</option>
+										<option value="2">Descending</option>
+									</select>
+								</div>
+							</div>
+							&nbsp
+							<div>
+								<button type="submit" class="btn btn-outline-primary">Search</button>
+								&nbsp
+								<button type="button"
+									th:onclick="|window.location.href='@{/admin_users/?keyword={keyword}&perPage={perPage}&sort={sort}&currPage={currPage}&sortOr={sortOr}(perPage=0,keyword='',sort='id',currPage=1,sortOr=1)}'|"
+									class="btn btn-outline-primary">Reset</button>
+								<div></div>
+
+
+
+
+
+
+
+
+							</div>
+							<div
+								style="height: 700px; overflow-y: scroll; overflow-x: hidden;">
+								<table class="table" align="center">
+									<thead>
+										<tr>
+											<th>
+												<div th:switch="${sortOr}">
+
+													<button th:case="2" id="id" class="btn btn-outline-success"
+														type="button"
+														th:onclick="|window.location.href='@{/admin_users/?keyword={keyword}&perPage={perPage}&sort={sort}&currPage={currPage}&sortOr={sortOr}(perPage=${perPage},keyword=${keyword},currPage=${currPage},sort='id', sortOr=1)}'|">Id</button>
+													<button th:case="*" id="id" class="btn btn-outline-success"
+														type="button"
+														th:onclick="|window.location.href='@{/admin_users/?keyword={keyword}&perPage={perPage}&sort={sort}&currPage={currPage}&sortOr={sortOr}(perPage=${perPage},keyword=${keyword},currPage=${currPage},sort='id', sortOr=2)}'|">Id</button>
+
+												</div>
+											</th>
+											<th>
+												<div th:switch="${sortOr}">
+
+													<button th:case="2" id="firstName"
+														class="btn btn-outline-success" type="button"
+														th:onclick="|window.location.href='@{/admin_users/?keyword={keyword}&perPage={perPage}&sort={sort}&currPage={currPage}&sortOr={sortOr}(perPage=${perPage},keyword=${keyword},currPage=${currPage},sort='firstName', sortOr=1)}'|">First
+														Name</button>
+													<button th:case="*" id="firstName"
+														class="btn btn-outline-success" type="button"
+														th:onclick="|window.location.href='@{/admin_users/?keyword={keyword}&perPage={perPage}&sort={sort}&currPage={currPage}&sortOr={sortOr}(perPage=${perPage},keyword=${keyword},currPage=${currPage},sort='firstName', sortOr=2)}'|">First
+														Name</button>
+
+												</div>
+											</th>
+											<th>
+												<div th:switch="${sortOr}">
+
+													<button th:case="2" id="lastName"
+														class="btn btn-outline-success" type="button"
+														th:onclick="|window.location.href='@{/admin_users/?keyword={keyword}&perPage={perPage}&sort={sort}&currPage={currPage}&sortOr={sortOr}(perPage=${perPage},keyword=${keyword},currPage=${currPage},sort='lastName', sortOr=1)}'|">Last
+														Name</button>
+													<button th:case="*" id="lastName"
+														class="btn btn-outline-success" type="button"
+														th:onclick="|window.location.href='@{/admin_users/?keyword={keyword}&perPage={perPage}&sort={sort}&currPage={currPage}&sortOr={sortOr}(perPage=${perPage},keyword=${keyword},currPage=${currPage},sort='lastName', sortOr=2)}'|">Last
+														Name</button>
+
+												</div>
+											</th>
+
+											<th>
+												<div th:switch="${sortOr}">
+
+													<button th:case="2" id="email"
+														class="btn btn-outline-success" type="button"
+														th:onclick="|window.location.href='@{/admin_users/?keyword={keyword}&perPage={perPage}&sort={sort}&currPage={currPage}&sortOr={sortOr}(perPage=${perPage},keyword=${keyword},currPage=${currPage},sort='email', sortOr=1)}'|">Email</button>
+													<button th:case="*" id="email"
+														class="btn btn-outline-success" type="button"
+														th:onclick="|window.location.href='@{/admin_users/?keyword={keyword}&perPage={perPage}&sort={sort}&currPage={currPage}&sortOr={sortOr}(perPage=${perPage},keyword=${keyword},currPage=${currPage},sort='email', sortOr=2)}'|">Email</button>
+
+												</div>
+
+											</th>
+											<th>
+												<div th:switch="${sortOr}">
+
+													<button th:case="2" id="role"
+														class="btn btn-outline-success" type="button"
+														th:onclick="|window.location.href='@{/admin_users/?keyword={keyword}&perPage={perPage}&sort={sort}&currPage={currPage}&sortOr={sortOr}(perPage=${perPage},keyword=${keyword},currPage=${currPage},sort='role', sortOr=1)}'|">Role</button>
+													<button th:case="*" id="role"
+														class="btn btn-outline-success" type="button"
+														th:onclick="|window.location.href='@{/admin_users/?keyword={keyword}&perPage={perPage}&sort={sort}&currPage={currPage}&sortOr={sortOr}(perPage=${perPage},keyword=${keyword},currPage=${currPage},sort='role', sortOr=2)}'|">Role</button>
+
+												</div>
+											</th>
+
+										</tr>
+									</thead>
+
+									<tbody>
+										<tr th:each="user : ${list}">
+											<div class="modal fade" th:id="'homeModal' + ${user.id}"
+												data-bs-backdrop="static" data-bs-keyboard="false"
+												tabindex="-1"
+												th:aria-labelledby="'homeModalLabel' + ${user.id}"
+												aria-hidden="true">
+												<div class="modal-dialog">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h5 class="modal-title"
+																th:id="'homeModalLabel' + ${user.id}">Warning</h5>
+															<button type="button" class="btn-close"
+																data-bs-dismiss="modal" aria-label="Close"></button>
+														</div>
+														<div class="modal-body">Are you certain you want to
+															delete this user?</div>
+														<div class="modal-footer">
+															<button id="deleteButton" type="button"
+																class="btn btn-secondary" data-bs-dismiss="modal"
+																th:onclick="|window.location.href='@{/delete/{id}/?keyword={keyword2}&perPage={perPage}&sort={sort}&currPage={currPage}&sortOr={sortOr}(perPage= ${perPage}, keyword2=${keyword},id=${user.id}, sort=${sort},currPage=${currPage},sortOr=${sortOr})}'|">
+																Delete User</button>
+															<a th:href="@{/home}" type="button"
+																class="btn btn-primary">Cancel </a>
+														</div>
+													</div>
+												</div>
+											</div>
+											<td th:text="${user.id}"></td>
+											<td th:text="${user.firstName}"></td>
+											<td th:text="${user.lastName}"></td>
+
+											<td th:text="${user.email}"></td>
+											<td th:text="${user.roles}"></td>
+											<td align="center">
+												<button class="btn btn-outline-success" value=false
+													type="button"
+													th:onclick="|window.location.href='@{/edit/{id}/?keyword={keyword2}&perPage={perPage}&sort={sort}&currPage={currPage}&sortOr={sortOr}(perPage= ${perPage}, keyword2=${keyword2},id=${user.id}, sort=${sort},currPage=${currPage},sortOr=${sortOr})}'|">Edit
+													User</button>
+											</td>
+											<td align="center">
+
+
+												<button class="btn btn-outline-danger " type="button"
+													data-bs-toggle="modal"
+													th:data-bs-target="'#homeModal' + ${user.id}">Delete
+													User</button>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+
+
+							</div>
+							<form
+								th:action="@{/admin_users/?keyword={keyword}&perPage={perPage}&sort={sort}&currPage={currPage}&sortOr={sortOr}(perPage=${perPage},keyword=${keyword},sort=${sort},currPage=${currPage},sortOr=${sortOr})}"
+								method="get">
+								<tr th:each="pages2 : ${pages2}">
+
+									<button th:id="${pages2}" class="btn btn-outline-success"
+										type="button"
+										th:onclick="|window.location.href='@{/admin_users/?keyword={keyword}&perPage={perPage}&sort={sort}&currPage={currPage}&sortOr={sortOr}(perPage=${perPage},keyword=${keyword},sort=${sort},currPage=${pages2}, sortOr=${sortOr})}'|"
+										th:text="${pages2}"></button>
+								</tr>
+							</form>
+						</div>
+
+					</div>
+			</div>
+			</form>
+
+
+
+			<h3 id="test"></h3>
+
+			<script th:inline="javascript">
+	
+		var sort = [[${sort}]];
+		var sortOr = [[${sortOr}]];
+
+		var pageNum = [[${currPage}]];
+
+		//document.getElementById(sort).innerHTML = "TEST";
+		
+		function checkSort() {
+			if(sortOr == 1){
+				document.getElementById(sort).style.background = "#4CAF50";
+				document.getElementById(sort).style.color = "#ffffff";
+
+
+			}
+			else{
+				document.getElementById(sort).style.background = "#CC0000";
+				document.getElementById(sort).style.color = "#ffffff";
+
+
+			}
+
+		}
+			
+		
+		function checkPage(){
+			//document.getElementById("ageshow").innerHTML = pageNum;
+			if(document.getElementById(pageNum)){
+				
+				document.getElementById(pageNum).style.background = "#4CAF50";
+				document.getElementById(pageNum).style.color = "#ffffff";
+
+
+			}
+
+			
+		}
+		checkSort();
+		checkPage();
+
+
+
+	</script>
+
+			<script>
+function uploadSpinner(id) {
+	document.getElementById(id).style.visibility = 'hidden';
+	document.getElementById(id).style.display = 'none';
+	document.getElementById(id + "Load").removeAttribute("hidden");
+}
+
+</script>
+
+			<script>
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();
+});
+</script>
+
+			<script
+				src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+				integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+				crossorigin="anonymous"></script>
+</body>
+</html>

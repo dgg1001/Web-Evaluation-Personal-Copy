@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<!-- Required meta tags -->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<!-- Eval form CSS -->
+		<link rel="stylesheet" type="text/css" href="/css/eval_form.css" />
+		
+		<!-- Bootstrap CSS -->
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+			crossorigin="anonymous">
+		<script
+			src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+			integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+			crossorigin="anonymous">
+			
+		</script>
+		
+		<script type="text/javascript">
+					function radioClicked(questID, option) {
+						//alert("ID: " + questID + " OPTION: " + option);
+						var insertDiv = document.getElementById(questID + "-insert-response");
+						var questID = "ID" + questID + "ID";
+						insertDiv.innerHTML = "<input type=\"hidden\" name=\"response\" value=\"" + questID + "\"><input type=\"hidden\" name=\"response\" value=\"" + option + "\">";			   
+					}
+					
+					function radioClickedVisControls(questID, option, targetResponseType, targetID) {
+						//alert("ID: " + questID + " OPTION: " + option);
+						var insertDiv = document.getElementById(questID + "-insert-response");
+						var questID = "ID" + questID + "ID";
+						insertDiv.innerHTML = "<input type=\"hidden\" name=\"response\" value=\"" + questID + "\"><input type=\"hidden\" name=\"response\" value=\"" + option + "\">";
+						
+						if (option == "Yes") {
+							//alert("Showing: 'controlled-by-'" + questID);
+							document.getElementById("controlled-by-" + questID).style.visibility = "visible";
+						}
+						if (option == "No") {
+							//alert("Showing: 'controlled-by-'" + questID);
+							document.getElementById("controlled-by-" + questID).style.visibility = "hidden";
+							
+							if(targetResponseType == "PARAGRAPH TEXT") {
+								document.getElementById("PTEXT-" + targetID).value = "";
+							} else if(targetResponseType == "SINGLE LINE TEXT") {
+								document.getElementById("STEXT-" + targetID).value = "";
+							} else if(targetResponseType == "RADIO BUTTON") {
+								var target = "ID" + targetID + "ID";
+								document.getElementById(targetID + "-insert-response").innerHTML = "<input type=\"hidden\" name=\"response\" value=\"" + target + "\"><input type=\"hidden\" name=\"response\" value=\"~\">";
+							} else if(targetResponseType == "DROPDOWN") {
+								document.getElementById("DROP-" + targetID).selectedIndex = "0";
+							}
+						}
+					}	
+
+					function checkBoxNAClicked(questID, options) {
+						
+						var checkNaId = "CHECK-QID-" + questID + "-OPT-N/A";
+						var checkboxNA = document.getElementById(checkNaId);
+						
+						if (checkboxNA.checked) {
+							
+							for (i = 0; i<options.length; i++) {
+								//alert(options[i]);
+								
+								if (options[i] != "N/A") {
+									var checkId = "CHECK-QID-" + questID + "-OPT-" + options[i];
+									var checkbox = document.getElementById(checkId);
+									checkbox.checked = false;
+									checkbox.disabled = true;
+								}
+							}
+							
+						} else {
+							
+							for (i = 0; i<options.length; i++) {
+								//alert(options[i]);
+								
+								if (options[i] != "N/A") {
+									var checkId = "CHECK-QID-" + questID + "-OPT-" + options[i];
+									var checkbox = document.getElementById(checkId);
+									checkbox.disabled = false;
+								}
+							}
+						}
+					}
+					
+					function updateCheckboxes(questID, options) {
+						for (i = 0; i<options.length; i++) {
+							//alert(options[i]);
+							
+							if (options[i] != "N/A") {
+								var checkId = "CHECK-QID-" + questID + "-OPT-" + options[i];
+								var checkbox = document.getElementById(checkId);
+								checkbox.checked = false;
+								checkbox.disabled = true;
+							}
+						}
+					}
+					
+					function hideControlledQuestions(questID) {
+						document.getElementById(questID).style.visibility = "hidden";
+					}
+		</script>
+		
+		<title>Evaluation Form</title>
+	</head>
+	
+	<body>
+		<form action="#" th:action="@{/save_eval/{log}(log=${log})}" th:object="${eval}" enctype="multipart/form-data" method="post">
+	
+			<!-- UPPER NAV BAR -->
+			<nav class="navbar navbar-light bg-light  justify-content-center ">
+				<div class="btn-group">
+					<a th:href="@{/Evaluationgroups}" class="btn btn-outline-danger" type="button">Cancel Evaluation</a>
+					<button type="submit" class="btn btn-outline-success" name="completed" value="true">Submit</button>
+					<button type="submit" class="btn btn-outline-success" name="completed" value="false">Save for Later</button>
+		
+					<span id="-upload"> <input type="file" name="file"
+							id="-file" /> <a href="#"
+							onclick="return !(document.getElementById('-upload').innerHTML=document.getElementById('-upload').innerHTML);">X</a>
+						</span>
+				</div>
+			</nav>
+			
+			<div class="container  mt-5">
+			
+				<!-- CASE: IF ERRORS -->
+				<div th:switch="${error}">
+					<div class="row">
+						<div class="col">
+							<h2 th:case="null"></h2>
+							<div th:case="*">
+								<div class="alert alert-danger" role="alert"
+									th:utext="'<Strong>ERROR:&nbsp</strong>' + ${error}"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<div class="row">
+					<div class="col text-center">
+						<strong class="text-center"><span class="text-danger">*</span> = Required Question</strong>
+					</div>
+				</div>
+
+				<div class="container"> <!-- BEGIN EVALUATION FORM -->
+				
+					<div class="row">
+						<div class="col-1"></div>
+						<div class="col-10 border border-secondary rounded-3 "> <!-- BEGIN EVAL DIV  -->
+						
+							<div class="row p-4">
+								<h1 class="display-6 text-center" th:text="${eval.title}"></h1>
+								<h5 class="text-muted text-center" th:text="${eval.description}"></h5>
+							</div>
+				
+							<th:block th:each="section: ${eval.Sections}">
+							
+								<div class="row border-top border-bottom border-secondary mt-5 p-2 bg-secondary bg-opacity-25">
+									<h3 th:text="${section.SecName}"></h3>
+									<h5 class="text-muted" th:utext="${section.SecDescription}"></h5>
+								</div>
+								
+								<div class="row m-2">
+									<th:block th:each="question: ${section.Questions}">
+									
+										<div th:class="${section.RowClass} + ' p-3'" th:attr="id=${question.VisControlledBy == null}? 'none' : ${question.ContolledByStr}">
+											
+											<th:block th:if="${question.VisControlledBy != null}">
+												<th:block th:if="${eval.getQuestionById(question.VisControlledBy).QResponse != 'Yes'}">
+													<img src th:onerror="hideControlledQuestions([[${question.ContolledByStr}]])">
+												</th:block>
+											</th:block>
+											
+											
+											<!-- SWITCH FOR INCOMPLETE/REQUIRED QUESTION MARKING -->
+											<th:block th:switch="${incompQuests}">
+												<th:block th:case="null">
+													<th:block th:if="${question.Required} == true">
+														<strong th:utext="${question.QText} + '<span class=\'text-danger\'>*</span>'"></strong>
+													</th:block>
+													<th:block th:unless="${question.Required} == true">
+														<strong th:utext="${question.QText}"></strong>
+													</th:block>
+												</th:block>
+												<th:block th:case="*">
+													<th:block th:if="${incompQuests.empty}">
+														<th:block th:if="${question.Required} == true">
+															<strong th:utext="${question.QText} + '<span class=\'text-danger\'>*</span>'"></strong>
+														</th:block>
+														<th:block th:unless="${question.Required} == true">
+															<strong th:utext="${question.QText}"></strong>
+														</th:block>
+													</th:block>
+													<th:block th:unless="${incompQuests.empty}">
+														<th:block th:if="${incompQuests.contains(question.QuestID)}">
+															<strong class="border border-danger rounded-2 bg-danger bg-opacity-25" th:utext="${question.QText} + '<span class=\'text-danger\'>*</span>'"></strong>
+														</th:block>
+														<th:block th:unless="${incompQuests.contains(question.QuestID)}">
+															<th:block th:if="${question.Required} == true">
+																<strong th:utext="${question.QText} + '<span class=\'text-danger\'>*</span>'"></strong>
+															</th:block>
+															<th:block th:unless="${question.Required} == true">
+																<strong th:utext="${question.QText}"></strong>
+															</th:block>
+														</th:block>
+													</th:block>
+												</th:block>
+											</th:block>
+											
+											<small class="text-muted" th:text="${question.QDescription}"></small>
+			
+											<!-- QUESTION TYPE SWITCH -->
+											<div th:switch="${question.QResponseType}"> 
+			
+												<div th:case="'RADIO BUTTON'">
+												
+													<th:block th:if="${question.VisControls == null}">
+														<th:block th:each="option: ${question.Options}">
+															<th:block th:if="${option == question.QResponse}">
+																<input type="radio" th:name="${question.QuestID}" th:value="${option}" th:onclick="radioClicked([[${question.QuestID}]],[[${option}]])" checked>
+																<img src th:onerror="radioClicked([[${question.QuestID}]],[[${option}]])">
+															</th:block>
+															<th:block th:unless="${option == question.QResponse}">
+																<input type="radio" th:name="${question.QuestID}" th:value="${option}" th:onclick="radioClicked([[${question.QuestID}]],[[${option}]])">
+															</th:block>
+															<label th:text="${option}"></label>
+															<br>
+														</th:block>
+													</th:block>
+													
+													<th:block th:unless="${question.VisControls == null}">
+														<th:block th:each="option: ${question.Options}">
+															<th:block th:if="${option == question.QResponse}">
+																<input type="radio" th:name="${question.QuestID}" th:value="${option}" th:onclick="radioClickedVisControls([[${question.QuestID}]],[[${option}]],[[${eval.getQuestionById(question.VisControls).QResponseType}]],[[${question.VisControls}]])" checked>
+																<img src th:onerror="radioClickedVisControls([[${question.QuestID}]],[[${option}]],[[${eval.getQuestionById(question.VisControls).QResponseType}]],[[${question.VisControls}]])">
+															</th:block>
+															<th:block th:unless="${option == question.QResponse}">
+																<input type="radio" th:name="${question.QuestID}" th:value="${option}" th:onclick="radioClickedVisControls([[${question.QuestID}]],[[${option}]],[[${eval.getQuestionById(question.VisControls).QResponseType}]],[[${question.VisControls}]])">
+															</th:block>
+															<label th:text="${option}"></label>
+															<br>
+														</th:block>
+													</th:block>
+													
+													<div th:id=" ${question.QuestID} + '-insert-response'"></div>
+												</div>
+												
+												<div th:case="'CHECK BOX'">
+													<input type="hidden" name="response" th:value="'ID' + ${question.QuestID} + 'ID'">
+													
+													<th:block th:each="option: ${question.Options}">
+														
+														<th:block th:if="${question.responseListIsEmpty}">
+															
+															<th:block th:if="${option} == 'N/A'">
+																<input type="checkbox" name="response" th:value="${option}" th:id="'CHECK-QID-' + ${question.QuestID} + '-OPT-' + ${option}" th:onclick="checkBoxNAClicked([[${question.QuestID}]],[[${question.Options}]])">
+															</th:block>
+															<th:block th:unless="${option} == 'N/A'">
+																<input type="checkbox" name="response" th:value="${option}" th:id="'CHECK-QID-' + ${question.QuestID} + '-OPT-' + ${option}">
+															</th:block>
+
+														</th:block>
+														
+														<th:block th:unless="${question.responseListIsEmpty}">
+															
+															<th:block th:if="${question.presentInResponses(option)}">
+																<th:block th:if="${option} == 'N/A'">
+																	<input type="checkbox" name="response" th:value="${option}" th:id="'CHECK-QID-' + ${question.QuestID} + '-OPT-' + ${option}" th:onclick="checkBoxNAClicked([[${question.QuestID}]],[[${question.Options}]])" checked>
+																</th:block>
+																<th:block th:unless="${option} == 'N/A'">
+																	<input type="checkbox" name="response" th:value="${option}" th:id="'CHECK-QID-' + ${question.QuestID} + '-OPT-' + ${option}" checked>
+																</th:block>
+															</th:block>
+															
+															<th:block th:unless="${question.presentInResponses(option)}">
+																<th:block th:if="${option} == 'N/A'">
+																	<input type="checkbox" name="response" th:value="${option}" th:id="'CHECK-QID-' + ${question.QuestID} + '-OPT-' + ${option}" th:onclick="checkBoxNAClicked([[${question.QuestID}]],[[${question.Options}]])">
+																</th:block>
+																<th:block th:unless="${option} == 'N/A'">
+																	<input type="checkbox" name="response" th:value="${option}" th:id="'CHECK-QID-' + ${question.QuestID} + '-OPT-' + ${option}">
+																</th:block>
+															</th:block>
+															
+														</th:block>
+														
+														<label th:text="${option}"></label>
+														<br>
+														
+													</th:block>
+													
+													<th:block th:if="${question.presentInResponses('N/A')}">
+														<img src th:onerror="updateCheckboxes([[${question.QuestID}]],[[${question.Options}]])">
+													</th:block>
+													
+												</div>
+			
+												<div th:case="'DROPDOWN'">
+													<input type="hidden" name="response" th:value="'ID' + ${question.QuestID} + 'ID'">
+													<select name="response" th:id="'DROP-' + ${question.QuestID}">
+														<th:block th:if="${question.QResponse == ''}">
+															<option selected disabled hidden>Select an Option</option>
+														</th:block>
+														<th:block th:unlsee="${question.QResponse == ''}">
+															<option hidden>Select an Option</option>
+														</th:block>
+														
+														<th:block th:each="option: ${question.Options}">
+															<th:block th:if="${option == question.QResponse}">
+																<option th:text="${option}" selected></option>
+															</th:block>
+															<th:block th:unless="${option == question.QResponse}">
+																<option th:text="${option}"></option>
+															</th:block>
+														</th:block>
+													</select>
+												</div>
+			
+												<div th:case="'SINGLE LINE TEXT'">
+													<input type="hidden" name="response" th:value="'ID' + ${question.QuestID} + 'ID'">
+													<input type="text" th:id="'STEXT-' + ${question.QuestID}" name="response" th:value="${question.QResponse}" class="form-control">
+												</div>
+			
+												<div th:case="'PARAGRAPH TEXT'">
+													<input type="hidden" name="response" th:value="'ID' + ${question.QuestID} + 'ID'">
+													<textarea th:id="'PTEXT-' + ${question.QuestID}" name="response" class="form-control" rows="10" th:text="${question.QResponse}"></textarea>
+												</div>
+			
+												<div th:case="'COMPUTE'">
+													<span th:utext="${question.QResponse}"></span>
+												</div>
+												
+												<div th:case="'PRE-LOAD'">
+													<span class="text-muted" th:utext="${question.QResponse}"></span>
+												</div>
+			
+											</div>
+										</div>
+									</th:block> <!-- END QUESTIONS BLOCK -->
+								</div>
+			
+							</th:block> <!-- END SECTIONS BLOCK -->
+						
+						
+						</div> <!-- END EVAL DIV -->
+						<div class="col-1"></div>
+					
+					</div>
+				
+				</div> <!-- End Evaluation container -->
+				
+				<!-- LOWER NAV BAR -->
+				<nav class="navbar navbar-light bg-light  justify-content-center ">
+					<div class="btn-group">
+						<a th:href="@{/Evaluationgroups}" class="btn btn-outline-danger" type="button">Cancel Evaluation</a>
+						<button type="submit" class="btn btn-outline-success" name="completed" value="true">Submit</button>
+						<button type="submit" class="btn btn-outline-success" name="completed" value="false">Save for Later</button>
+					</div>
+				</nav>
+			</div> <!-- END CONTAINER -->
+			
+			
+			
+		</form>
+	</body>
+</html>

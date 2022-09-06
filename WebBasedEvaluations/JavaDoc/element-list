@@ -1,0 +1,9 @@
+edu.sru.group3.WebBasedEvaluations
+edu.sru.group3.WebBasedEvaluations.configuration
+edu.sru.group3.WebBasedEvaluations.controller
+edu.sru.group3.WebBasedEvaluations.domain
+edu.sru.group3.WebBasedEvaluations.evalform
+edu.sru.group3.WebBasedEvaluations.excel
+edu.sru.group3.WebBasedEvaluations.model
+edu.sru.group3.WebBasedEvaluations.repository
+edu.sru.group3.WebBasedEvaluations.service
